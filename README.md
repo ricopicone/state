@@ -4,7 +4,15 @@ State is a Mathematica package for deriving the equations of state for a dynamic
 ## Installation
 Clone or download the repository. 
 
-To fully install, copy the `State.m` Mathematica package file to any directory in your Mathematica *path* (to see which directories are in your path, evaluate `$Path` in a Mathematica notebook).
+To fully install, copy the `State.m` Mathematica package file to a directory in your Mathematica *path* (to see which directories are in your path, evaluate `$Path` in a Mathematica notebook). It is recommended to use the path that is returned by Mathematica when you evaluate `FileNameJoin[{$UserBaseDirectory, "Applications"}]`.
+
+Another option for full installation is to 
+
+- open Mathematica, 
+- select `File > Install...`, 
+- select `Package` from the `Type of Item to Install` menu,
+- select `State.m` from the `Source > File...` menu, and
+- select `OK`.
 
 Once `State` is fully installed, it can be loaded into a Mathematica notebook with the command
 
