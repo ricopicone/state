@@ -11,7 +11,7 @@ Another option for full installation is to
 - open Mathematica, 
 - select `File > Install...`, 
 - select `Package` from the `Type of Item to Install` menu,
-- select `State.m` from the `Source > File...` menu, and
+- select `State.m` from the `Source > File...` dialog, and
 - select `OK`.
 
 Once `State` is fully installed, it can be loaded into a Mathematica notebook with the command
