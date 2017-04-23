@@ -1,5 +1,5 @@
 # State
-State is a Mathematica package for assisting in the derivation of the equations of state for a dynamic system. It was originally developed by Joseph L. Garbini at the University of Washington, who continues to contribute to its maintenance, along with Rico A.R. Picone of Saint Martin's University and Cameron N. Devine.
+State is a Mathematica package for assisting in the derivation of the equations of state for a dynamic system. It was originally developed by Joseph L. Garbini at the University of Washington, who continues to contribute to its development, along with Rico A.R. Picone of Saint Martin's University and Cameron N. Devine.
 
 ## Installation
 Clone or download the repository. 
