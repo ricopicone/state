@@ -1,5 +1,5 @@
 # State
-State is a Mathematica package for deriving the equations of state for a dynamic system. It was originally developed by Joseph L. Garbini at the University of Washington.
+State is a Mathematica package for assisting in the derivation of the equations of state for a dynamic system. It was originally developed by Joseph L. Garbini at the University of Washington, who continues to contribute to its maintenance, along with Rico A.R. Picone of Saint Martin's University and Cameron N. Devine.
 
 ## Installation
 Clone or download the repository. 
@@ -25,4 +25,4 @@ The package can also be loaded from the working directory, which can be set to t
 If `State.m` is then placed in the same directory as the notebook, it can be loaded with the same command (`<<State``) without requiring full installation.
 
 ## Getting started
-There are two example notebooks that work out a few problems. Open the notebooks in Mathematica and run them. They work without fully installing the package.
+There are example notebooks that show applications. Open the notebooks in Mathematica and run them. They work without fully installing the package.
