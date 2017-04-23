@@ -22,7 +22,7 @@ The package can also be loaded from the working directory, which can be set to t
 
     SetDirectory[NotebookDirectory[]];
 
-If `State.m` is then placed in the same directory as the notebook, it can be loaded with the same command (``<<State```) without requiring full installation.
+If `State.m` is then placed in the same directory as the notebook, it can be loaded with the same command (``<<State` ``) without requiring full installation.
 
 ## Getting started
 There are example notebooks that show applications. Open the notebooks in Mathematica and run them. They work without fully installing the package.
