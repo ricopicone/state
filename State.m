@@ -1,24 +1,100 @@
 (* ::Package:: *)
 
-(* ::Text:: *)
-(*Compute the linear state model (a,b,c,d) and transfer functions, for a MIMO system.*)
-(*Note: this cell is an initialization cell.*)
-
-
 BeginPackage["State`"];
 
+stateEquations::usage =
+"stateEquations[
+	inVars_List,    (* input variable names, e.g. vS[t] *)
+	stateVars_List, (* state variable names, e.g. vC1[t] *)
+	equations_List  (* first-order ode and algebraic eqs, e.g. vC1'[t]==1/C1*iC1[t] *)
+]
+Returns the state equations as a list of replacement rules.
+N.b. can handle some nonlinear systems.
+N.b. a common mistake is to place the prime after the argument, but it should appear before, e.g. vC2'[t].
+N.b. another common mistake is to use the assignment operator '=' instead of the boolean equals '==' in equations.
+N.b. the arrangement of the equations (i.e. lhs/rhs) is immaterial.
+N.b. for the output equations, use the function outEquations instead.
+N.b. to linearize the returned state equations, use the function linearizeState.";
+
+stateEquations[inVars_List,stateVars_List,equations_List] :=
+Module[{allVars,elimVars,stateEqs},
+
+(* Extract variables to eliminate *)
+allVars = equations//extractFunctions;
+elimVars = allVars//Complement[#,joinWDer[inVars~Join~stateVars,t]]&;
+
+(* Eliminate non state and input variables and place in standard form *)
+stateEqs = equations//Eliminate[#,elimVars]&//Solve[#,D[stateVars,t]]&//Collect[#,stateVars]&;
+stateEqs//Flatten//Return;
+];
+
+outEquations::usage =
+"outEquations[
+	inVars_List,    (* input variable names, e.g. vS[t] *)
+	stateVars_List, (* state variable names, e.g. vC1[t] *)
+	outExps_List,   (* output expressions, e.g. vR2[t]+3*vC1[t] *)
+	equations_List  (* first-order ode and algebraic eqs, e.g. vC1'[t]==1/C1*iC1[t] *)
+]
+Returns the rhs of the output equations as a list.
+N.b. can handle some nonlinear systems.
+N.b. can handle any expressions in outExps as long as they are expressed in terms of variables included in the
+equations list. These are *not* limited to state variables! They can be primary or secondary and expressions thereof.
+N.b. a common mistake is to place the prime after the argument, but it should appear before, e.g. vC2'[t].
+N.b. another common mistake is to use the assignment operator '=' instead of the boolean equals '==' in equations.
+N.b. the arrangement of the equations (i.e. lhs/rhs) is immaterial.
+N.b. for the state equations, use the function stateEquations instead.
+N.b. to linearize the returned output equations, use the function linearizeState.";
+
+outEquations[inVars_List,stateVars_List,outExps_List,equations_List]:=
+Module[{allVars,elimVars,outEqs,outEqsRaw,yOut,stateEqsID,sansStateEqsID},
+
+(* Extract variables to eliminate *)
+allVars = equations//extractFunctions;
+elimVars = allVars//Complement[#,joinWDer[inVars~Join~stateVars,t]]&;
+
+(* Solve for output expressions in terms of state and input variables*)
+stateEqsID=equations//Position[#,x_'[y_],{0,Infinity}]&//Transpose//First//{#}&//Transpose;
+sansStateEqsID=equations//Delete[#,stateEqsID]&;
+yOut=Table[y[i],{i,1,Length[outExps]}];
+outEqsRaw=Thread[yOut==outExps];
+
+outEqs=(outEqsRaw~Join~sansStateEqsID)//
+	Eliminate[#,elimVars]&//
+		Solve[#,yOut]&//
+			Collect[#,stateVars]&;
+yOut/.outEqs//Flatten//Return;
+]
+
+extractFunctions::usage =
+"extractFunctions[
+	exp_ (* expression that contains function variables, e.g. vC1'[t]==1/C1*iC1[t] *)
+]
+Returns a list of function variables, e.g. iC1[t].";
+
+extractFunctions[exp_]:=exp//Cases[#,x_[y_]:>x[y],{0,Infinity}]&//DeleteDuplicates;
+
+joinWDer::usage =
+"joinWDer[
+	list_List, (* a list of expressions, e.g. {vC1[t],vc2[t]} *)
+	t_Symbol   (* symbol with respect to which list is differentiated *)
+]
+Returns input list joined with its derivative, e.g. {vC1[t],vc2[t],vC1'[t],vC2'[t]}.";
+
+joinWDer[list_List,t_Symbol]:=list~Join~D[list,t];
+
+
 State::usage =
-        "State[
+"State[
 	InVars,         (* input variable names.  e.g.  vS   *)
 	StVarElEqns,    (* state equations for state variable.  e.g.  vM' == 1/M fM   *)
 	OtherElEqns,    (* other elemental equations. 
                                           e.g. v1 \[Equal] Km o2, or tJm = Jm oJm'   *)
 	Constraints,    (* constraint expressions.  e.g.  fM \[Rule] fD - f4   *)
 	OutputVars      (* output variables.  e.g.  fM   *)
-    ]
+]
 Computes the state equations, StEqn. 
 Also, gives the a, b, c, d, e, f matricies and transfer functions, TfM, for a linear state model.
-StateVers=1.3";
+StateVers=1.4 (legacy ... see stateEquations)";
 
 State[InVarsLo_,
 	StVarElEqnsLo_,
@@ -126,12 +202,5 @@ StateVers=1.3;
 a=OutputEqsFinal;
 {a}*)
 ];
-EndPackage[ ];
 
-
-(* ::Output:: *)
-(*"StateModel`Private`"*)
-
-
-(* ::Output:: *)
-(*"StateModel`Private`"*)
+EndPackage[];
