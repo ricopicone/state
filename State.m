@@ -8,7 +8,7 @@ stateEquations::usage =
 	stateVars_List, (* state variable names, e.g. vC1[t] *)
 	equations_List  (* first-order ode and algebraic eqs, e.g. vC1'[t]==1/C1*iC1[t] *)
 ]
-Returns the state equations as a list of replacement rules.
+Returns the rhs of the state equations as a list.
 N.b. can handle some nonlinear systems.
 N.b. a common mistake is to place the prime after the argument, but it should appear before, e.g. vC2'[t].
 N.b. another common mistake is to use the assignment operator '=' instead of the boolean equals '==' in equations.
@@ -25,7 +25,7 @@ elimVars = allVars//Complement[#,joinWDer[inVars~Join~stateVars,t]]&;
 
 (* Eliminate non state and input variables and place in standard form *)
 stateEqs = equations//Eliminate[#,elimVars]&//Solve[#,D[stateVars,t]]&//Collect[#,stateVars]&;
-stateEqs//Flatten//Return;
+stateVars//D[#,t]&//ReplaceAll[#,stateEqs]&//Flatten//Return;
 ];
 
 outEquations::usage =
@@ -63,6 +63,48 @@ outEqs=(outEqsRaw~Join~sansStateEqsID)//
 		Solve[#,yOut]&//
 			Collect[#,stateVars]&;
 yOut/.outEqs//Flatten//Return;
+]
+
+linearizeState::usage =
+"linearizeState[
+	inVars_List, (* input variables *)
+	inVarsOP_List, (* operating point for input variables *)
+	stateVars_List, (* state variables *)
+	stateVarsOP_List, (* operating point for state variables *)
+	equations_List (* rhs of nonlinear (or linear) state equation *)
+]
+Returns an array containing the A and B matrices {A,B} of the input state equation
+linearized about the input and state operating point.";
+
+linearizeState[inVars_List,inVarsOP_List,stateVars_List,stateVarsOP_List,equations_List]:=
+Module[{a,b,stateVarsOPRules,inVarsOPRules,OPRules},
+stateVarsOPRules=Thread[stateVars->stateVarsOP];
+inVarsOPRules=Thread[inVars->inVarsOP];
+OPRules=stateVarsOPRules~Join~inVarsOPRules;
+a=equations//D[#,{stateVars}]&//ReplaceAll[#,OPRules]&; (* Jacobian wrt x *)
+b=equations//D[#,{inVars}]&//ReplaceAll[#,OPRules]&;(* Jacobian wrt u *)
+{a,b}//Return;
+]
+
+linearizeOutput::usage =
+"linearizeState[
+	inVars_List, (* input variables *)
+	inVarsOP_List, (* operating point for input variables *)
+	stateVars_List, (* state variables *)
+	stateVarsOP_List, (* operating point for state variables *)
+	equations_List (* rhs of nonlinear (or linear) output equation *)
+]
+Returns an array containing the C and D matrices {C,D} of the output equation
+linearized about the input and state operating point.";
+
+linearizeOutput[inVars_List,inVarsOP_List,stateVars_List,stateVarsOP_List,equations_List]:=
+Module[{c,d,stateVarsOPRules,inVarsOPRules,OPRules},
+stateVarsOPRules=Thread[stateVars->stateVarsOP];
+inVarsOPRules=Thread[inVars->inVarsOP];
+OPRules=stateVarsOPRules~Join~inVarsOPRules;
+c=equations//D[#,{stateVars}]&//ReplaceAll[#,OPRules]&; (* Jacobian wrt x *)
+d=equations//D[#,{inVars}]&//ReplaceAll[#,OPRules]&;(* Jacobian wrt u *)
+{c,d}//Return;
 ]
 
 extractFunctions::usage =
