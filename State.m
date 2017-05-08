@@ -43,7 +43,7 @@ N.b. a common mistake is to place the prime after the argument, but it should ap
 N.b. another common mistake is to use the assignment operator '=' instead of the boolean equals '==' in equations.
 N.b. the arrangement of the equations (i.e. lhs/rhs) is immaterial.
 N.b. for the state equations, use the function stateEquations instead.
-N.b. to linearize the returned output equations, use the function linearizeState.";
+N.b. to linearize the returned output equations, use the function linearizeOutput.";
 
 outEquations[inVars_List,stateVars_List,outExps_List,equations_List]:=
 Module[{allVars,elimVars,outEqs,outEqsRaw,yOut,stateEqsID,sansStateEqsID},
@@ -87,7 +87,7 @@ b=equations//D[#,{inVars}]&//ReplaceAll[#,OPRules]&;(* Jacobian wrt u *)
 ]
 
 linearizeOutput::usage =
-"linearizeState[
+"linearizeOutput[
 	inVars_List, (* input variables *)
 	inVarsOP_List, (* operating point for input variables *)
 	stateVars_List, (* state variables *)
